@@ -79,7 +79,7 @@ def action(state: AgentState):
             User responsibilities and obligations in the agreement
             """)
             llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
-            system = f"You are an assistant who advises a user on terms and conditions, user will give some extracts from the webpage. Give a detailed report on the terms and conditions outlining which terms they should take careful note of. Rank them from extremely sensitive to least. Use simple, understandable English. If the document extracts have are not terms of services or similar simply return 'Not Relevant'. Always remind that your response is simply a breakdown and should not substitute legal advice in bold capital letters at the beginning. If there's something wrong with the webpage return 'There is something wrong with this webpage..🫤'"
+            system = f"You are an assistant who advises a user on terms and conditions, user will give some extracts from the webpage. Give a detailed report on the terms and conditions outlining which terms they should take careful note of. Rank them from extremely sensitive to least. Use simple, understandable English. If the document extracts are not terms of services or similar simply return 'Not Relevant'. Always remind the user that your response is simply a breakdown and should not substitute legal advice in bold capital letters at the beginning. If there's something wrong with the webpage return 'There is something wrong with this webpage..🫤'"
             prompt = ChatPromptTemplate([
                 ("system", system),
                 ("human", f"Document extracts:\n{"\n\n".join([i.page_content for i in info])}")
