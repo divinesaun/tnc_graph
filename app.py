@@ -27,10 +27,19 @@ def extract_html(url):
     split_docs = splitter.split_documents([doc])
     length_of_docs = len(split_docs)
     print(f"Length of docs: {length_of_docs}")
-    vector = FAISS.from_documents(split_docs, embedding=embedding)
-    print("Converting extracted data to vector")
-    retriever = vector.as_retriever(search_kwargs={"k": 10})
-    return retriever
+    if split_docs != []:
+        vector = FAISS.from_documents(split_docs, embedding=embedding)
+        print("Converting extracted data to vector")
+        retriever = vector.as_retriever(search_kwargs={"k": 10})
+        return retriever
+    else:
+        doc = Document(
+            page_content="There's something wrong with this webpage..🫤",
+        )
+        vector = FAISS.from_documents([doc], embedding=embedding)
+        print("Converting extracted data to vector")
+        retriever = vector.as_retriever(search_kwargs={"k": 10})
+        return retriever
 
 from typing import TypedDict
 
@@ -62,9 +71,15 @@ def action(state: AgentState):
         if is_available:
             retriever = extract_html(question)
             print("Converting documents to retriever")
-            info = retriever.invoke("sensitive terms and conditions")
+            info = retriever.invoke("""
+            Clauses about sharing user data with third parties,
+            Terms limiting the company's responsibility or liability"
+            Arbitration or waiver of legal rights in the terms,
+            Billing policies including automatic renewals or charges,
+            User responsibilities and obligations in the agreement
+            """)
             llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
-            system = f"You are an assistant who advises user on terms and conditions, user will give some extracts from the webpage. Give a detailed report on the terms and conditions outlining which terms they should take careful note of. Rank them from extremely sensitive to least. Use simple, understandable English. If the document extracts have are not terms of services or similar simply return 'Not Relevant'. Always remind that your response is simply a breakdown and should not substitute legal advice in bold capital letters at the beginning."
+            system = f"You are an assistant who advises user on terms and conditions, user will give some extracts from the webpage. Give a detailed report on the terms and conditions outlining which terms they should take careful note of. Rank them from extremely sensitive to least. Use simple, understandable English. If the document extracts have are not terms of services or similar simply return 'Not Relevant'. Always remind that your response is simply a breakdown and should not substitute legal advice in bold capital letters at the beginning. If there's something wrong with the webpage return 'There is something wrong with this webpage..🫤'"
             prompt = ChatPromptTemplate([
                 ("system", system),
                 ("human", f"Document extracts:\n{"\n\n".join([i.page_content for i in info])}")
