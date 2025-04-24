@@ -73,7 +73,7 @@ def action(state: AgentState):
                 state["result"] = chain.invoke({})
                 return state
             except KeyError:
-                state["result"] = "This website is not supported at the moment.."
+                state["result"] = AIMessage(content="This website is not supported at the moment..")
                 return state
         else:
             state["result"] = AIMessage(content="The website is unavailable!")
