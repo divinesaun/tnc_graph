@@ -72,7 +72,7 @@ def action(state: AgentState):
             try:
                 state["result"] = chain.invoke({})
                 return state
-            except:
+            except KeyError:
                 state["result"] = "This website is not supported at the moment.."
                 return state
         else:
