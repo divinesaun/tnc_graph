@@ -73,13 +73,13 @@ def action(state: AgentState):
                 state["result"] = chain.invoke({})
                 return state
             except KeyError:
-                state["result"] = AIMessage(content="This website is not supported at the moment..")
+                state["result"] = AIMessage(content="This website is not supported at the moment..🫤")
                 return state
         else:
-            state["result"] = AIMessage(content="The website is unavailable!")
+            state["result"] = AIMessage(content="The website is unavailable! 🤷‍♂️")
             return state
     else:
-        state["result"] = AIMessage(content="Please enter a valid URL!")
+        state["result"] = AIMessage(content="Please enter a valid URL! 🙄")
         return state
 
 from langgraph.graph import StateGraph, START, END
