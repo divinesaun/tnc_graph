@@ -24,9 +24,12 @@ def extract_html(url):
             page_content=clean_text,
         )
     splitter = RecursiveCharacterTextSplitter(chunk_size=4000, chunk_overlap=100)
-    vector = FAISS.from_documents(splitter.split_documents([doc]), embedding=embedding)
+    split_docs = splitter.split_documents([doc])
+    length_of_docs = len(split_docs)
+    print(f"Length of docs: {length_of_docs}")
+    vector = FAISS.from_documents(split_docs, embedding=embedding)
     print("Converting extracted data to vector")
-    retriever = vector.as_retriever(search_kwargs={"k": 4})
+    retriever = vector.as_retriever(search_kwargs={"k": 10})
     return retriever
 
 from typing import TypedDict
