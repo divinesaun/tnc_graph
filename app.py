@@ -51,6 +51,7 @@ def is_available(text: str) -> bool:
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.messages import AIMessage
 
 def action(state: AgentState):
     question = state["question"]
@@ -60,7 +61,7 @@ def action(state: AgentState):
             print("Converting documents to retriever")
             info = retriever.invoke("sensitive terms and conditions")
             llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
-            system = f"You are an assistant who advises user on terms and conditions, user will give some extracts from the webpage. Give a detailed report on the terms and conditions outlining which terms they should take careful note of. Rank them from extremely sensitive to least. Use simple, understandable English"
+            system = f"You are an assistant who advises user on terms and conditions, user will give some extracts from the webpage. Give a detailed report on the terms and conditions outlining which terms they should take careful note of. Rank them from extremely sensitive to least. Use simple, understandable English. If the document extracts have are not terms of services or similar simply return 'Not Relevant'. Always remind that your response is simply a breakdown and should not substitute legal advice in bold capital letters at the beginning."
             prompt = ChatPromptTemplate([
                 ("system", system),
                 ("human", f"Document extracts:\n{"\n\n".join([i.page_content for i in info])}")
@@ -68,12 +69,18 @@ def action(state: AgentState):
 
             chain = prompt | llm
             print("Using llm to get result")
-            state["result"] = chain.invoke({})
-            return state
+            try:
+                state["result"] = chain.invoke({})
+                return state
+            except:
+                state["result"] = "This website is not supported at the moment.."
+                return state
         else:
-            state["result"] = "The website is unavailable!"
+            state["result"] = AIMessage(content="The website is unavailable!")
+            return state
     else:
-        state["result"] = "Please enter a valid URL!"
+        state["result"] = AIMessage(content="Please enter a valid URL!")
+        return state
 
 from langgraph.graph import StateGraph, START, END
 
