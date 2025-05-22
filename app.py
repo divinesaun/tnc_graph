@@ -80,7 +80,7 @@ def action(state: AgentState):
             """)
             llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
             system = f"""You are an assistant who advises a user on terms and conditions,
-            the user will give some extracts from the webpage.
+            the user will give some extracts from the webpage. Make sure the web page is of terms and conditions before analysis.
             Give a detailed report on the terms and conditions outlining which terms they should take careful note of.
             Rank them from extremely sensitive to least. Use simple, understandable English.
             If the document extracts are not terms of services or similar simply return 'Not Relevant'.
